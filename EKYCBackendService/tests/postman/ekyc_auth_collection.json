@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "EKYC Auth - Epic 126321",
+    "_postman_id": "f2e1d8a8-0000-4c00-a000-000000000126",
+    "description": "Initial failing API tests to drive implementation for Epic 126321. Reference: kavia-docs/TestCases_Epic_126321_User_Registration_and_Authentication.md",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [],
+  "item": [
+    {
+      "name": "Mobile OTP",
+      "item": [
+        {
+          "name": "Send Mobile OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"mobile\":\"9876543210\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/otp/mobile/send", "host": ["{{baseUrl}}"], "path": ["api","auth","otp","mobile","send"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for Send Mobile OTP (expected)', function () {",
+                  "  pm.response.to.have.status(200); // currently likely 404 - will fail to drive implementation",
+                  "});",
+                  "pm.test('Body contains success true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Mobile OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"mobile\":\"9876543210\",\"otp\":\"123456\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/otp/mobile/verify", "host": ["{{baseUrl}}"], "path": ["api","auth","otp","mobile","verify"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for Verify Mobile OTP (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains verified true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('verified', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Email OTP",
+      "item": [
+        {
+          "name": "Send Email OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"user@example.com\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/otp/email/send", "host": ["{{baseUrl}}"], "path": ["api","auth","otp","email","send"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for Send Email OTP (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains success true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Email OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"user@example.com\",\"otp\":\"123456\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/otp/email/verify", "host": ["{{baseUrl}}"], "path": ["api","auth","otp","email","verify"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for Verify Email OTP (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains verified true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('verified', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Password Creation",
+      "item": [
+        {
+          "name": "Create Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"identifier\":\"user@example.com\",\"password\":\"StrongP@ssw0rd!\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/register/password", "host": ["{{baseUrl}}"], "path": ["api","auth","register","password"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for Create Password (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains created true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('created', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Login with Mobile/Email and Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"identifier\":\"user@example.com\",\"password\":\"StrongP@ssw0rd!\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 on successful login (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains token', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('token');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Password Recovery",
+      "item": [
+        {
+          "name": "Request Recovery",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"identifier\":\"user@example.com\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/password/recovery", "host": ["{{baseUrl}}"], "path": ["api","auth","password","recovery"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for password recovery request (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains success true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"token\":\"dummy\",\"password\":\"StrongP@ssw0rd!\"}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/password/reset", "host": ["{{baseUrl}}"], "path": ["api","auth","password","reset"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for password reset (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains success true', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Validation",
+      "item": [
+        {
+          "name": "Validate Identifier",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"identifier\":\"user@example.com\"}" },
+            "url": { "raw": "{{baseUrl}}/api/validation/identifier", "host": ["{{baseUrl}}"], "path": ["api","validation","identifier"] }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 for validation (expected)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Body contains valid boolean', function () {",
+                  "  var json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('valid');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
