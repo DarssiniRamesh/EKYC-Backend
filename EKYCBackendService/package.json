@@ -2,11 +2,28 @@
   "name": "ekyc-backend-service",
   "private": true,
   "version": "0.0.1",
+  "main": "src/server.js",
+  "type": "commonjs",
   "scripts": {
+    "start": "node src/server.js",
+    "dev": "PORT=${PORT:-3001} nodemon src/server.js",
+    "lint": "eslint .",
+    "generate:openapi": "node generate_openapi.js",
     "test:api": "newman run tests/postman/ekyc_auth_collection.json -e tests/postman/environments/local.postman_environment.json",
     "test:api:ci": "newman run tests/postman/ekyc_auth_collection.json -e tests/postman/environments/local.postman_environment.json --reporters cli,junit --reporter-junit-export newman-report.xml"
   },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
   "devDependencies": {
-    "newman": "^6.2.1"
+    "eslint": "^8.57.0",
+    "newman": "^6.2.1",
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
