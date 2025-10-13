@@ -8,10 +8,8 @@ const router = express.Router();
  * Logs method and path for each request hitting this router.
  * Remove after verification.
  */
-router.use((req, res, next) => {
+router.use((req, _res, next) => {
   console.log('[router:auth]', req.method, req.originalUrl || req.url);
-  // Enforce JSON requests and responses for API routes
-  res.type('application/json');
   next();
 });
 
@@ -19,7 +17,7 @@ router.use((req, res, next) => {
  * @swagger
  * tags:
  *   - name: Auth
- *     description: OTP and authentication routes
+ *     description: OTP and authentication routes (stub)
  */
 
 /**
@@ -221,16 +219,4 @@ router.post('/password/recovery', authController.requestRecovery.bind(authContro
  */
 router.post('/password/reset', authController.resetPassword.bind(authController));
 
-/**
- * PUBLIC_INTERFACE
- * Export the authentication router which provides:
- * - POST /otp/mobile/send
- * - POST /otp/mobile/verify
- * - POST /otp/email/send
- * - POST /otp/email/verify
- * - POST /register/password
- * - POST /login
- * - POST /password/recovery
- * - POST /password/reset
- */
 module.exports = router;
