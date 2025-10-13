@@ -1,11 +1,26 @@
 const express = require('express');
 const healthController = require('../controllers/health');
+const authRoutes = require('./auth');
 
 const router = express.Router();
 
 // Health endpoints (both / and /health return the same)
 router.get('/', healthController.check.bind(healthController));
 router.get('/health', healthController.check.bind(healthController));
+
+// Mount auth routes under /api/auth
+router.use('/api/auth', authRoutes);
+
+// Validation route expected by tests
+router.post('/api/validation/identifier', (req, res, next) => {
+  // delegate to auth controller to avoid extra import here
+  try {
+    const authController = require('../controllers/auth');
+    return authController.validateIdentifier(req, res);
+  } catch (e) {
+    return next(e);
+  }
+});
 
 /**
  * @swagger
