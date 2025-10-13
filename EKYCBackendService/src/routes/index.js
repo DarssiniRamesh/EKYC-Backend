@@ -11,7 +11,7 @@ router.get('/health', healthController.check.bind(healthController));
 // Mount auth routes under /api/auth
 router.use('/api/auth', authRoutes);
 
-// Validation route expected by tests
+ // Validation route expected by tests
 router.post('/api/validation/identifier', (req, res, next) => {
   // delegate to auth controller to avoid extra import here
   try {
@@ -20,6 +20,18 @@ router.post('/api/validation/identifier', (req, res, next) => {
   } catch (e) {
     return next(e);
   }
+});
+
+// Catch-all for unknown API routes to ensure JSON error (prevents HTML)
+router.all(['/api/*', '/api'], (req, res) => {
+  const hint =
+    'If you see this from the frontend, confirm API_BASE_URL points to the backend (e.g., http://localhost:3001), not the React dev server.';
+  return res.status(404).json({
+    success: false,
+    error: 'not_found',
+    path: req.originalUrl || req.url,
+    hint
+  });
 });
 
 /**
@@ -89,5 +101,13 @@ router.get('/debug/routes', (req, res) => {
  *     responses:
  *       200:
  *         description: Service health check passed
+ */
+/**
+ * PUBLIC_INTERFACE
+ * Export the main router that mounts:
+ * - GET / and GET /health for health checks
+ * - /api/auth/* for authentication and OTP
+ * - /api/validation/identifier for simple validation
+ * Includes /debug/routes for route introspection
  */
 module.exports = router;

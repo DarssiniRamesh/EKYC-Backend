@@ -13,9 +13,15 @@ Health check:
 
 Swagger docs:
 - http://localhost:3001/docs
+- http://localhost:3001/openapi.json
 
 Temporary debug (for route verification during setup):
 - http://localhost:3001/debug/routes  # lists all registered routes
+
+Common issue: Unexpected token '<' "<!DOCTYPE..." is not valid JSON
+- This happens if the frontend calls http://localhost:3000/api/... (React dev server) instead of backend.
+- Ensure API_BASE_URL points to http://localhost:3001 (or your deployed backend URL).
+- All unknown API paths return JSON { success:false, error:'not_found' } to avoid HTML fallbacks.
 
 ## Environment variables
 

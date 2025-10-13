@@ -201,9 +201,25 @@ class AuthController {
 
       return res.status(200).json(response);
     } catch (e) {
-      const status = e.code === 'CONFIG_MISSING' ? 500 : 500;
-      console.error('[auth.sendMobileOtp] error', { requestId, code: e.code, message: e.message });
-      return res.status(status).json({ success: false, error: 'otp_send_failed', requestId });
+      // Normalize Twilio/Config errors to JSON
+      let status = 500;
+      let errorCode = 'otp_send_failed';
+      if (e.code === 'CONFIG_MISSING') {
+        errorCode = 'twilio_config_missing';
+      } else if (typeof e.status === 'number' && e.status >= 400) {
+        status = e.status;
+      }
+      console.error('[auth.sendMobileOtp] error', {
+        requestId,
+        code: e.code,
+        status,
+        message: e.message
+      });
+      return res.status(status).type('application/json').json({
+        success: false,
+        error: errorCode,
+        requestId
+      });
     } finally {
       client.release();
     }
@@ -241,19 +257,19 @@ class AuthController {
           [mobile]
         );
         if (rows[0]?.expires_at && new Date(rows[0].expires_at) < new Date()) {
-          return res.status(410).json({ success: false, error: 'otp_expired' });
+          return res.status(410).type('application/json').json({ success: false, error: 'otp_expired' });
         }
-        return res.status(400).json({ success: false, error: 'otp_not_found' });
+        return res.status(400).type('application/json').json({ success: false, error: 'otp_not_found' });
       }
 
       // Check attempts
       if (record.attempts >= record.max_attempts) {
-        return res.status(423).json({ success: false, error: 'max_attempts_reached' });
+        return res.status(423).type('application/json').json({ success: false, error: 'max_attempts_reached' });
       }
 
       // Check expiry
       if (new Date(record.expires_at) <= new Date()) {
-        return res.status(410).json({ success: false, error: 'otp_expired' });
+        return res.status(410).type('application/json').json({ success: false, error: 'otp_expired' });
       }
 
       // Verify
@@ -261,17 +277,18 @@ class AuthController {
       if (!ok) {
         const { newAttempts, locked } = await incrementAttempts(client, record.id, record.attempts, record.max_attempts);
         if (locked) {
-          return res.status(423).json({ success: false, error: 'max_attempts_reached' });
+          return res.status(423).type('application/json').json({ success: false, error: 'max_attempts_reached' });
         }
-        return res.status(400).json({ success: false, error: 'otp_incorrect', attempts: newAttempts });
+        return res.status(400).type('application/json').json({ success: false, error: 'otp_incorrect', attempts: newAttempts });
       }
 
       // Success: consume
       await consumeOtp(client, record.id);
-      return res.status(200).json({ success: true, verified: true });
+      console.log('[auth.verifyMobileOtp] success', { mobileMasked: maskMobileForUser(mobile) });
+      return res.status(200).type('application/json').json({ success: true, verified: true });
     } catch (e) {
       console.error('[auth.verifyMobileOtp] error', { message: e.message, code: e.code });
-      return res.status(500).json({ success: false, error: 'otp_verify_failed' });
+      return res.status(500).type('application/json').json({ success: false, error: 'otp_verify_failed' });
     } finally {
       client.release();
     }
