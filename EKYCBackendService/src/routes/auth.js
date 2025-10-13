@@ -17,7 +17,7 @@ router.use((req, _res, next) => {
  * @swagger
  * tags:
  *   - name: Auth
- *     description: OTP and authentication routes (stub)
+ *     description: OTP and authentication routes
  */
 
 /**
