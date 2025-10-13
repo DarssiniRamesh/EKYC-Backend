@@ -4,6 +4,16 @@ const authController = require('../controllers/auth');
 const router = express.Router();
 
 /**
+ * Lightweight router-level logger for tracing during setup.
+ * Logs method and path for each request hitting this router.
+ * Remove after verification.
+ */
+router.use((req, _res, next) => {
+  console.log('[router:auth]', req.method, req.originalUrl || req.url);
+  next();
+});
+
+/**
  * @swagger
  * tags:
  *   - name: Auth
@@ -208,17 +218,5 @@ router.post('/password/recovery', authController.requestRecovery.bind(authContro
  *         description: Reset success
  */
 router.post('/password/reset', authController.resetPassword.bind(authController));
-
-/**
- * @swagger
- * /api/validation/identifier:
- *   post:
- *     summary: Validate identifier (stub)
- *     tags: [Auth]
- *     responses:
- *       200:
- *         description: Validation success
- */
-router.post('/../validation/identifier', authController.validateIdentifier.bind(authController));
 
 module.exports = router;

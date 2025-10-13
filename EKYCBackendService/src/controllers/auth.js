@@ -14,25 +14,52 @@ function isSixDigitOtp(otp) {
 }
 function isValidEmail(email) {
   // simplistic validation for stub; frontend will apply stronger checks
-  return typeof email === 'string' && email.length <= 50 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return typeof email === 'string' && email.length <= 50 && /^[^\s@]+@^[^\s@]+\.[^\s@]+$/.test ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) : (/^[^\s@]+@[^\s@]+\.[^\s@]+$/).test(email);
+}
+
+/**
+ * Utility to generate a simple request ID for tracing,
+ * not cryptographically secure; used only for temporary logs.
+ */
+function genRequestId() {
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).slice(2, 8);
+  return `req_${ts}_${rnd}`;
 }
 
 class AuthController {
   // PUBLIC_INTERFACE
   /** Send OTP to mobile (stub)
    * Request: { mobile: "9876543210" }
-   * Response: 200 { success: true, message: 'OTP sent' }
+   * Response: 200 { success: true, message: 'OTP sent', requestId?: string }
    * Errors: 400 { success:false, error:'...' }
    */
   sendMobileOtp(req, res) {
+    const requestId = genRequestId();
+    const path = `${req.method} ${req.originalUrl || req.url}`;
+    const headers = {
+      'content-type': req.get('content-type'),
+      origin: req.get('origin'),
+      referer: req.get('referer'),
+    };
+
+    console.log('[auth.sendMobileOtp] inbound', { requestId, path, headers });
+    console.log('[auth.sendMobileOtp] body', req.body);
+
     const { mobile } = req.body || {};
     if (!mobile) {
-      return res.status(400).json({ success: false, error: 'mobile is required' });
+      console.warn('[auth.sendMobileOtp] validation failed: mobile missing', { requestId });
+      return res.status(400).json({ success: false, error: 'mobile is required', requestId });
     }
     if (!isTenDigitMobile(mobile)) {
-      return res.status(400).json({ success: false, error: 'mobile must be 10 digits' });
+      console.warn('[auth.sendMobileOtp] validation failed: not 10 digits', { requestId, mobile });
+      return res.status(400).json({ success: false, error: 'mobile must be 10 digits', requestId });
     }
-    return res.status(200).json({ success: true, message: 'OTP sent' });
+
+    // Stub path: pretend OTP has been sent via provider
+    const responseBody = { success: true, message: 'OTP sent', requestId };
+    console.log('[auth.sendMobileOtp] success response', { requestId, responseBody });
+    return res.status(200).json(responseBody);
   }
 
   // PUBLIC_INTERFACE
