@@ -14,6 +14,10 @@ const server = app.listen(PORT, HOST, () => {
   const base = `http://${HOST}:${PORT}`;
   console.log(`EKYC Backend Service running at ${base}`);
   console.log(`Health: ${base}/health or ${base}/`);
+  console.log(`Auth (expected): POST ${base}/api/auth/otp/mobile/send`);
+  console.log(`Debug routes: GET ${base}/debug/routes`);
+  console.log('Tip: curl -s -X POST -H "Content-Type: application/json" -d \'{"mobile":"9876543210"}\' ' +
+              `${base}/api/auth/otp/mobile/send`);
 });
 
 // Graceful shutdown

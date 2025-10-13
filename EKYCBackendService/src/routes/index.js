@@ -23,6 +23,42 @@ router.post('/api/validation/identifier', (req, res, next) => {
 });
 
 /**
+ * Temporary: route map for debugging registered endpoints.
+ * Lists method and path for each route registered on the app.
+ * Remove this once verification is complete.
+ */
+router.get('/debug/routes', (req, res) => {
+  const app = req.app;
+  const routes = [];
+
+  function parseStack(stack, prefix = '') {
+    stack.forEach((layer) => {
+      if (layer.route && layer.route.path) {
+        const methods = Object.keys(layer.route.methods)
+          .filter((m) => layer.route.methods[m])
+          .map((m) => m.toUpperCase());
+        routes.push({
+          methods,
+          path: `${prefix}${layer.route.path}`.replace(/\/+/g, '/'),
+        });
+      } else if (layer.name === 'router' && layer.handle && layer.regexp) {
+        // Extract mount path from layer.regexp if possible
+        const match = layer.regexp.toString().match(/\\\/(.*?)\\\//);
+        const mount = match && match[1] ? `/${match[1]}` : '';
+        if (layer.handle.stack) {
+          parseStack(layer.handle.stack, `${prefix}${mount}`);
+        }
+      }
+    });
+  }
+
+  if (app && app._router && app._router.stack) {
+    parseStack(app._router.stack);
+  }
+  res.json({ count: routes.length, routes });
+});
+
+/**
  * @swagger
  * /:
  *   get:

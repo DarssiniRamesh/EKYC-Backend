@@ -13,6 +13,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.set('trust proxy', true);
+console.log('[bootstrap] CORS enabled with origin=*');
+
 app.use('/docs', swaggerUi.serve, (req, res, next) => {
   const host = req.get('host');           // may or may not include port
   let protocol = req.protocol;          // http or https
@@ -40,9 +42,11 @@ app.use('/docs', swaggerUi.serve, (req, res, next) => {
 
 // Parse JSON request body
 app.use(express.json());
+console.log('[bootstrap] express.json() parser enabled');
 
 // Mount routes
 app.use('/', routes);
+console.log('[bootstrap] Main router mounted at "/" (includes /api/auth/*, /health, /debug/routes)');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
